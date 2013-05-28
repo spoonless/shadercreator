@@ -1,0 +1,4 @@
+external
+*.pro.user
+*.[oa]
+
