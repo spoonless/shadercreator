@@ -3,12 +3,12 @@
 GlError::GlError()
     :_errorFlag(GL_NO_ERROR)
 {
+    reset();
 }
 
 GlError::GlError(const GlError& error)
     : _errorFlag(error._errorFlag)
 {
-    reset();
 }
 
 GlError& GlError::operator = (const GlError& glerror)

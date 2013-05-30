@@ -19,6 +19,11 @@ public:
         return _shaderId;
     }
 
+    inline ShaderType getType() const
+    {
+        return _type;
+    }
+
     void extractSource(std::string& source) const;
 
     inline unsigned int getCompilationDuration() const
