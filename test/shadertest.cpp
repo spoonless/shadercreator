@@ -7,28 +7,34 @@ class ShaderTest : public QObject
 
 private slots:
 
-    void canCompileVertexShader()
+    void canCreateVertexShader()
     {
         Shader shader(Shader::VERTEX_SHADER);
-        bool compilationResult = shader.compile("void main(){}");
 
-        QVERIFY2(compilationResult, "shader compilation failed");
         QVERIFY(shader.getId() != 0);
+        QVERIFY(shader.isValid());
         QVERIFY(glIsShader(shader.getId()));
-        QVERIFY(shader.getType() == Shader::VERTEX_SHADER);
-        QVERIFY(getShaderType(shader) == GL_VERTEX_SHADER);
+        QCOMPARE(shader.getType(), Shader::VERTEX_SHADER);
+        QCOMPARE(getShaderType(shader), GL_VERTEX_SHADER);
     }
 
-    void canCompileFragmentShader()
+    void canCreateFragmentShader()
+    {
+        Shader shader(Shader::FRAGMENT_SHADER);
+
+        QVERIFY(shader.getId() != 0);
+        QVERIFY(shader.isValid());
+        QVERIFY(glIsShader(shader.getId()));
+        QCOMPARE(shader.getType(), Shader::FRAGMENT_SHADER);
+        QCOMPARE(getShaderType(shader), GL_FRAGMENT_SHADER);
+    }
+
+    void canCompileShader()
     {
         Shader shader(Shader::FRAGMENT_SHADER);
         bool compilationResult = shader.compile("void main(){}");
 
         QVERIFY2(compilationResult, "shader compilation failed");
-        QVERIFY(shader.getId() != 0);
-        QVERIFY(glIsShader(shader.getId()));
-        QVERIFY(shader.getType() == Shader::FRAGMENT_SHADER);
-        QVERIFY(getShaderType(shader) == GL_FRAGMENT_SHADER);
     }
 
     void cannotCompileErroneousCode()
@@ -49,7 +55,7 @@ private slots:
         std::string outputSource;
         shader.extractSource(outputSource);
 
-        QVERIFY2(outputSource == source, outputSource.c_str());
+        QCOMPARE(outputSource, source);
     }
 
     void canCopyShader()
@@ -63,24 +69,41 @@ private slots:
 
         QVERIFY(copyShader.getId() != shader.getId());
         QVERIFY(glIsShader(copyShader.getId()));
-        QVERIFY(copySource == "void main(){}");
+        QCOMPARE(copySource.c_str(), "void main(){}");
     }
 
     void canAssignShader()
     {
-        Shader shader(Shader::FRAGMENT_SHADER);
-        shader.compile("void fragment(){}");
+        Shader shader(Shader::VERTEX_SHADER);
+        shader.compile("void vertex(){}");
 
         Shader otherShader(Shader::VERTEX_SHADER);
-        otherShader.compile("void vertex(){}");
+        otherShader.compile("void otherVertex(){}");
 
         shader = otherShader;
         std::string source;
         shader.extractSource(source);
 
-        QVERIFY(shader.getType() == Shader::VERTEX_SHADER);
-        QVERIFY(source == "void vertex(){}");
-        QVERIFY(getShaderType(shader) == GL_VERTEX_SHADER);
+        QCOMPARE(shader.getType(), Shader::VERTEX_SHADER);
+        QCOMPARE(source.c_str(), "void otherVertex(){}");
+        QCOMPARE(getShaderType(shader), GL_VERTEX_SHADER);
+    }
+
+    void cannotAssignShaderOfDifferentType()
+    {
+        Shader shader(Shader::VERTEX_SHADER);
+        shader.compile("void vertex(){}");
+
+        Shader otherShader(Shader::FRAGMENT_SHADER);
+        otherShader.compile("void fragment(){}");
+
+        shader = otherShader;
+        std::string source;
+        shader.extractSource(source);
+
+        QCOMPARE(shader.getType(), Shader::VERTEX_SHADER);
+        QCOMPARE(source.c_str(), "void vertex(){}");
+        QCOMPARE(getShaderType(shader), GL_VERTEX_SHADER);
     }
 
 private:

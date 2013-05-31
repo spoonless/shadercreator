@@ -5,8 +5,9 @@
 
 #include "test.h"
 
-TEST_INCLUDE(ShaderTest)
 TEST_INCLUDE(GlErrorTest)
+TEST_INCLUDE(ShaderTest)
+TEST_INCLUDE(ShaderProgramTest)
 
 int main(int argc, char** argv) {
     QApplication app(argc, argv);
@@ -21,10 +22,11 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    int retval(0);
+    int retval = 0;
 
-    retval += TEST_RUN(ShaderTest);
-    retval += TEST_RUN(GlErrorTest);
+    retval |= TEST_RUN(GlErrorTest);
+    retval |= TEST_RUN(ShaderTest);
+    retval |= TEST_RUN(ShaderProgramTest);
 
-    return (retval ? 1 : 0);
+    return retval;
 }

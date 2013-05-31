@@ -9,7 +9,8 @@ include(../src/shadercreator.pri)
 
 SOURCES += shadertest.cpp \
     main.cpp \
-    glerrortest.cpp
+    glerrortest.cpp \
+    shaderprogramtest.cpp
 
 HEADERS += \
     test.h

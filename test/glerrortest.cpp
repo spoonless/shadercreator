@@ -14,9 +14,9 @@ private slots:
         GlError glError;
 
         QVERIFY(!glError.hasOccured());
-        QVERIFY(glError.getErrorFlag() == GL_NO_ERROR);
+        QCOMPARE(glError.getErrorFlag(), (GLenum)GL_NO_ERROR);
         std::string message = glError.toString("cannotDetectErrorAtInit");
-        QVERIFY2(message == "cannotDetectErrorAtInit: No error detected.", message.c_str());
+        QCOMPARE(message.c_str(), "cannotDetectErrorAtInit: No error detected.");
     }
 
     void canDetectErrorAfterInit()
@@ -27,9 +27,9 @@ private slots:
         glCompileShader(1000);
 
         QVERIFY(glError.hasOccured());
-        QVERIFY(glError.getErrorFlag() == GL_INVALID_VALUE);
+        QCOMPARE(glError.getErrorFlag(), (GLenum)GL_INVALID_VALUE);
         std::string message = glError.toString("canDetectErrorAfterInit");
-        QVERIFY2(message == "canDetectErrorAfterInit: A numeric argument is out of range.", message.c_str());
+        QCOMPARE(message.c_str(), "canDetectErrorAfterInit: A numeric argument is out of range.");
     }
 };
 
