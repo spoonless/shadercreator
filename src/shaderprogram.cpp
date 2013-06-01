@@ -10,7 +10,7 @@ ShaderProgram::ShaderProgram()
 ShaderProgram::ShaderProgram(const ShaderProgram& shaderProgram)
     : _shaderProgramId(glCreateProgram()), _linkageDuration(0)
 {
-    attachShaderFrom(shaderProgram);
+    attachShadersFrom(shaderProgram);
 }
 
 ShaderProgram::~ShaderProgram()
@@ -23,7 +23,7 @@ ShaderProgram& ShaderProgram::operator = (const ShaderProgram& shaderProgram)
     if (this != &shaderProgram)
     {
         detachAllShaders();
-        attachShaderFrom(shaderProgram);
+        attachShadersFrom(shaderProgram);
     }
     return *this;
 }
@@ -41,6 +41,11 @@ bool ShaderProgram::attach(const Shader& shader)
 
 bool ShaderProgram::has(const Shader& shader) const
 {
+    if (!shader.isValid())
+    {
+        return false;
+    }
+
     GLuint* shaders = getAttachedShaders();
     bool found = false;
 
@@ -117,7 +122,7 @@ void ShaderProgram::extractInfoLog()
     delete[] infoLogBuffer;
 }
 
-void ShaderProgram::attachShaderFrom(const ShaderProgram& shaderProgram)
+void ShaderProgram::attachShadersFrom(const ShaderProgram& shaderProgram)
 {
     GLuint* shaders = shaderProgram.getAttachedShaders();
     for (int i = 0; shaders[i] != 0; ++i)

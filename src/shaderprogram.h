@@ -46,7 +46,7 @@ public:
     }
 
 private:
-    void attachShaderFrom(const ShaderProgram& shaderProgram);
+    void attachShadersFrom(const ShaderProgram& shaderProgram);
     void extractInfoLog();
     void deleteShaderProgram();
     GLuint* getAttachedShaders()const;
