@@ -23,11 +23,11 @@ private slots:
         ShaderProgram shaderProgram;
         Shader shader(Shader::FRAGMENT_SHADER);
 
-        shaderProgram.attach(shader);
+        QVERIFY(shaderProgram.attach(shader));
 
         QVERIFY(shaderProgram.has(shader));
 
-        shaderProgram.detach(shader);
+        QVERIFY(shaderProgram.detach(shader));
         QVERIFY(!shaderProgram.has(shader));
     }
 
@@ -37,8 +37,8 @@ private slots:
         Shader shader1(Shader::VERTEX_SHADER);
         Shader shader2(Shader::FRAGMENT_SHADER);
 
-        shaderProgram.attach(shader1);
-        shaderProgram.attach(shader2);
+        QVERIFY(shaderProgram.attach(shader1));
+        QVERIFY(shaderProgram.attach(shader2));
 
         QVERIFY(shaderProgram.has(shader1));
         QVERIFY(shaderProgram.has(shader2));
