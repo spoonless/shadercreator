@@ -1,6 +1,9 @@
 #include <test.h>
 #include <shaderprogram.h>
 
+#define VALID_VERTEX_SHADER_SOURCE "void main(){gl_Position = gl_Vertex;}"
+#define VALID_FRAGMENT_SHADER_SOURCE "void main(){}"
+
 class ShaderProgramTest : public QObject
 {
     Q_OBJECT
@@ -46,11 +49,12 @@ private slots:
         QVERIFY(!shaderProgram.has(shader2));
     }
 
-    void canLinkProgramWithoutShader()
+    void cannotLinkProgramWithoutShader()
     {
         ShaderProgram shaderProgram;
 
-        QVERIFY(shaderProgram.link());
+        QVERIFY(!shaderProgram.link());
+        QCOMPARE(shaderProgram.getLastLinkLog().c_str(), "Cannot link program because no shader is attached!");
     }
 
     void cannotLinkProgramWhenShaderNotCompiled()
@@ -70,12 +74,12 @@ private slots:
 
         Shader fragmentShader(Shader::FRAGMENT_SHADER);
         shaderProgram.attach(fragmentShader);
-        fragmentShader.compile("void main(){}");
+        fragmentShader.compile(VALID_FRAGMENT_SHADER_SOURCE);
 
         QVERIFY(shaderProgram.link());
 
         Shader vertexShader(Shader::VERTEX_SHADER);
-        vertexShader.compile("void main(){}");
+        vertexShader.compile(VALID_VERTEX_SHADER_SOURCE);
         shaderProgram.attach(vertexShader);
 
         QVERIFY(shaderProgram.link());
@@ -86,11 +90,11 @@ private slots:
         ShaderProgram shaderProgram;
 
         Shader fragmentShader(Shader::FRAGMENT_SHADER);
-        fragmentShader.compile("void main(){}");
+        fragmentShader.compile(VALID_FRAGMENT_SHADER_SOURCE);
         shaderProgram.attach(fragmentShader);
 
         Shader vertexShader(Shader::VERTEX_SHADER);
-        vertexShader.compile("void main(){}");
+        vertexShader.compile(VALID_VERTEX_SHADER_SOURCE);
         shaderProgram.attach(vertexShader);
 
         ShaderProgram copy = shaderProgram;
@@ -108,11 +112,11 @@ private slots:
         ShaderProgram shaderProgram;
 
         Shader fragmentShader(Shader::FRAGMENT_SHADER);
-        fragmentShader.compile("void main(){}");
+        fragmentShader.compile(VALID_FRAGMENT_SHADER_SOURCE);
         shaderProgram.attach(fragmentShader);
 
         Shader vertexShader(Shader::VERTEX_SHADER);
-        vertexShader.compile("void main(){}");
+        vertexShader.compile(VALID_VERTEX_SHADER_SOURCE);
         shaderProgram.attach(vertexShader);
 
         ShaderProgram copy;
@@ -126,15 +130,6 @@ private slots:
         QVERIFY(copy.has(vertexShader));
         QVERIFY(!copy.has(anotherShader));
         QVERIFY(copy.link());
-    }
-
-    void canValidateLinkedProgramWithoutShader()
-    {
-        ShaderProgram shaderProgram;
-        shaderProgram.link();
-
-        QVERIFY(shaderProgram.validate());
-        QVERIFY(!shaderProgram.getLastValidationLog().empty());
     }
 
     void cannotValidateUnlinkProgram()
@@ -151,18 +146,17 @@ private slots:
 
         Shader fragmentShader(Shader::FRAGMENT_SHADER);
         shaderProgram.attach(fragmentShader);
-        fragmentShader.compile("void main(){}");
+        fragmentShader.compile(VALID_FRAGMENT_SHADER_SOURCE);
 
         QVERIFY(shaderProgram.link());
 
         Shader vertexShader(Shader::VERTEX_SHADER);
-        vertexShader.compile("void main(){}");
+        vertexShader.compile(VALID_VERTEX_SHADER_SOURCE);
         shaderProgram.attach(vertexShader);
 
         shaderProgram.link();
 
         QVERIFY(shaderProgram.validate());
-        QVERIFY(!shaderProgram.getLastValidationLog().empty());
     }
 };
 

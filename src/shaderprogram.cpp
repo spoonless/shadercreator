@@ -90,6 +90,23 @@ bool ShaderProgram::link()
     _linkageDuration = 0;
     GlError error;
 
+    /*
+     * Checking programmatically that at least one shader is attached to this program.
+     * NVidia and AMD cards have heterogeneous behaviors. Some allow link operation
+     * for program with no attached shader and some do not.
+     */
+    GLint nbShaders = getNbAttachedShaders();
+    if (error.hasOccured())
+    {
+        _lastLinkLog = error.toString("Cannot retrieve attached shaders");
+        return false;
+    }
+    if (!nbShaders)
+    {
+        _lastLinkLog = "Cannot link program because no shader is attached!";
+        return false;
+    }
+
     Duration duration;
     glLinkProgram(_shaderProgramId);
     _linkageDuration = duration.elapsed();
@@ -174,10 +191,16 @@ void ShaderProgram::deleteShaderProgram()
     }
 }
 
-GLuint* ShaderProgram::getAttachedShaders() const
+GLuint ShaderProgram::getNbAttachedShaders()const
 {
     GLint nbShaders = 0;
     glGetProgramiv(_shaderProgramId, GL_ATTACHED_SHADERS, &nbShaders);
+    return nbShaders;
+}
+
+GLuint* ShaderProgram::getAttachedShaders() const
+{
+    GLint nbShaders = getNbAttachedShaders();
 
     GLuint* shaders = new GLuint[nbShaders + 1];
 

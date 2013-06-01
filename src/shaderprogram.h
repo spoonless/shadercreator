@@ -53,6 +53,7 @@ private:
     void attachShadersFrom(const ShaderProgram& shaderProgram);
     void extractInfoLog(std::string &log);
     void deleteShaderProgram();
+    GLuint getNbAttachedShaders()const;
     GLuint* getAttachedShaders()const;
 
     GLuint _shaderProgramId;
