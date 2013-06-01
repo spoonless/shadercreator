@@ -1,3 +1,4 @@
+#include "duration.h"
 #include "shaderprogram.h"
 #include "glerror.h"
 
@@ -9,6 +10,7 @@ ShaderProgram::ShaderProgram()
 ShaderProgram::ShaderProgram(const ShaderProgram& shaderProgram)
     : _shaderProgramId(glCreateProgram()), _linkageDuration(0)
 {
+    attachShaderFrom(shaderProgram);
 }
 
 ShaderProgram::~ShaderProgram()
@@ -18,6 +20,11 @@ ShaderProgram::~ShaderProgram()
 
 ShaderProgram& ShaderProgram::operator = (const ShaderProgram& shaderProgram)
 {
+    if (this != &shaderProgram)
+    {
+        detachAllShaders();
+        attachShaderFrom(shaderProgram);
+    }
     return *this;
 }
 
@@ -69,7 +76,55 @@ void ShaderProgram::detachAllShaders()
 
 bool ShaderProgram::link()
 {
-    return false;
+    _log.clear();
+    _linkageDuration = 0;
+    GlError error;
+
+    Duration duration;
+    glLinkProgram(_shaderProgramId);
+    _linkageDuration = duration.elapsed();
+    if (error.hasOccured())
+    {
+        _log = error.toString("Cannot link program");
+        return false;
+    }
+
+    GLint linkStatus = GL_FALSE;
+    glGetProgramiv(_shaderProgramId, GL_LINK_STATUS, &linkStatus);
+
+    extractInfoLog();
+
+    return linkStatus == GL_TRUE;
+}
+
+void ShaderProgram::extractInfoLog()
+{
+    GlError error;
+    GLint infoLogLength = 0;
+
+    glGetProgramiv(_shaderProgramId, GL_INFO_LOG_LENGTH, &infoLogLength);
+
+    char* infoLogBuffer = new char[infoLogLength];
+    glGetProgramInfoLog(_shaderProgramId, infoLogLength, NULL, infoLogBuffer);
+    if (error.hasOccured())
+    {
+        _log = error.toString("Cannot retrieve properly shader program link log info");
+    }
+    else
+    {
+        _log = infoLogBuffer;
+    }
+    delete[] infoLogBuffer;
+}
+
+void ShaderProgram::attachShaderFrom(const ShaderProgram& shaderProgram)
+{
+    GLuint* shaders = shaderProgram.getAttachedShaders();
+    for (int i = 0; shaders[i] != 0; ++i)
+    {
+        glAttachShader(_shaderProgramId, shaders[i]);
+    }
+    delete[] shaders;
 }
 
 void ShaderProgram::deleteShaderProgram()
@@ -81,7 +136,7 @@ void ShaderProgram::deleteShaderProgram()
     }
 }
 
-GLuint* ShaderProgram::getAttachedShaders()const
+GLuint* ShaderProgram::getAttachedShaders() const
 {
     GLint nbShaders = 0;
     glGetProgramiv(_shaderProgramId, GL_ATTACHED_SHADERS, &nbShaders);
