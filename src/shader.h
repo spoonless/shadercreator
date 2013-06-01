@@ -19,10 +19,7 @@ public:
         return _shaderId;
     }
 
-    inline bool isValid() const
-    {
-        return _shaderId != 0;
-    }
+    bool exists() const;
 
     inline ShaderType getType() const
     {
@@ -38,9 +35,9 @@ public:
 
     bool compile(const char* source);
 
-    inline const std::string& getLog() const
+    inline const std::string& getLastCompilationLog() const
     {
-        return _log;
+        return _lastCompilationLog;
     }
 
 private:
@@ -51,7 +48,7 @@ private:
     GLuint _shaderId;
     const ShaderType _type;
     unsigned int _compilationDuration;
-    std::string _log;
+    std::string _lastCompilationLog;
 };
 
 #endif // SHADER_H

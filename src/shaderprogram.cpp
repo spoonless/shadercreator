@@ -28,9 +28,14 @@ ShaderProgram& ShaderProgram::operator = (const ShaderProgram& shaderProgram)
     return *this;
 }
 
+bool ShaderProgram::exists() const
+{
+    return _shaderProgramId != 0 && glIsProgram(_shaderProgramId);
+}
+
 bool ShaderProgram::attach(const Shader& shader)
 {
-    if (!shader.isValid())
+    if (!shader.exists())
     {
         return false;
     }
@@ -41,7 +46,7 @@ bool ShaderProgram::attach(const Shader& shader)
 
 bool ShaderProgram::has(const Shader& shader) const
 {
-    if (!shader.isValid())
+    if (!shader.exists())
     {
         return false;
     }
@@ -60,7 +65,7 @@ bool ShaderProgram::has(const Shader& shader) const
 
 bool ShaderProgram::detach(const Shader& shader)
 {
-    if (!shader.isValid())
+    if (!shader.exists())
     {
         return false;
     }
@@ -81,7 +86,7 @@ void ShaderProgram::detachAllShaders()
 
 bool ShaderProgram::link()
 {
-    _log.clear();
+    _lastLinkLog.clear();
     _linkageDuration = 0;
     GlError error;
 
@@ -90,19 +95,47 @@ bool ShaderProgram::link()
     _linkageDuration = duration.elapsed();
     if (error.hasOccured())
     {
-        _log = error.toString("Cannot link program");
+        _lastLinkLog = error.toString("Cannot link program");
         return false;
     }
 
     GLint linkStatus = GL_FALSE;
     glGetProgramiv(_shaderProgramId, GL_LINK_STATUS, &linkStatus);
 
-    extractInfoLog();
+    extractInfoLog(_lastLinkLog);
 
     return linkStatus == GL_TRUE;
 }
 
-void ShaderProgram::extractInfoLog()
+bool ShaderProgram::validate()
+{
+    _lastLinkLog.clear();
+    GlError error;
+
+    GLint linkStatus = GL_FALSE;
+    glGetProgramiv(_shaderProgramId, GL_LINK_STATUS, &linkStatus);
+    if (!linkStatus)
+    {
+        _lastValidationLog = "Cannot validate unlinked shader program";
+        return false;
+    }
+
+    glValidateProgram(_shaderProgramId);
+    if (error.hasOccured())
+    {
+        _lastValidationLog = error.toString("Cannot validate shader program");
+        return false;
+    }
+
+    GLint validationStatus = GL_FALSE;
+    glGetProgramiv(_shaderProgramId, GL_VALIDATE_STATUS, &validationStatus);
+
+    extractInfoLog(_lastValidationLog);
+
+    return validationStatus == GL_TRUE;
+}
+
+void ShaderProgram::extractInfoLog(std::string& log)
 {
     GlError error;
     GLint infoLogLength = 0;
@@ -113,11 +146,11 @@ void ShaderProgram::extractInfoLog()
     glGetProgramInfoLog(_shaderProgramId, infoLogLength, NULL, infoLogBuffer);
     if (error.hasOccured())
     {
-        _log = error.toString("Cannot retrieve properly shader program link log info");
+        log = error.toString("Cannot retrieve properly shader program link log info");
     }
     else
     {
-        _log = infoLogBuffer;
+        log = infoLogBuffer;
     }
     delete[] infoLogBuffer;
 }

@@ -25,9 +25,16 @@ public:
 
     bool link();
 
-    inline const std::string& getLog() const
+    bool validate();
+
+    inline const std::string& getLastLinkLog() const
     {
-        return _log;
+        return _lastLinkLog;
+    }
+
+    inline const std::string& getLastValidationLog() const
+    {
+        return _lastValidationLog;
     }
 
     inline GLuint getId() const
@@ -35,10 +42,7 @@ public:
         return _shaderProgramId;
     }
 
-    inline bool isValid() const
-    {
-        return _shaderProgramId != 0;
-    }
+    bool exists() const;
 
     inline unsigned long getLinkageDuration() const
     {
@@ -47,13 +51,14 @@ public:
 
 private:
     void attachShadersFrom(const ShaderProgram& shaderProgram);
-    void extractInfoLog();
+    void extractInfoLog(std::string &log);
     void deleteShaderProgram();
     GLuint* getAttachedShaders()const;
 
     GLuint _shaderProgramId;
     unsigned long _linkageDuration;
-    std::string _log;
+    std::string _lastLinkLog;
+    std::string _lastValidationLog;
 };
 
 #endif // SHADERPROGRAM_H

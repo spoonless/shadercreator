@@ -40,6 +40,11 @@ Shader& Shader::operator = (const Shader& shader)
     return *this;
 }
 
+bool Shader::exists() const
+{
+    return _shaderId != 0 && glIsShader(_shaderId);
+}
+
 void Shader::extractSource(std::string& source) const
 {
     GlError error;
@@ -82,14 +87,14 @@ bool Shader::compile(const char* source)
 
     if (source[0] == '\0')
     {
-        _log = "Shader source is empty!";
+        _lastCompilationLog = "Shader source is empty!";
         return false;
     }
 
     glShaderSource(_shaderId, 1, &source, NULL);
     if (error.hasOccured())
     {
-        _log = error.toString("Error while attaching source to shader (glShaderSource)");
+        _lastCompilationLog = error.toString("Error while attaching source to shader (glShaderSource)");
         return false;
     }
 
@@ -98,7 +103,7 @@ bool Shader::compile(const char* source)
     _compilationDuration= duration.elapsed();
     if (error.hasOccured())
     {
-        _log = error.toString("Error while compiling shader (glCompileShader)");
+        _lastCompilationLog = error.toString("Error while compiling shader (glCompileShader)");
         return false;
     }
 
@@ -122,7 +127,7 @@ void Shader::deleteShaderId()
         }
         _shaderId = 0;
         _compilationDuration = 0;
-        _log.clear();
+        _lastCompilationLog.clear();
     }
 }
 
@@ -137,11 +142,11 @@ void Shader::extractInfoLog()
     glGetShaderInfoLog(_shaderId, infoLogLength, NULL, infoLogBuffer);
     if (error.hasOccured())
     {
-        _log = error.toString("Cannot retrieve properly shader compilation log info");
+        _lastCompilationLog = error.toString("Cannot retrieve properly shader compilation log info");
     }
     else
     {
-        _log = infoLogBuffer;
+        _lastCompilationLog = infoLogBuffer;
     }
     delete[] infoLogBuffer;
 }

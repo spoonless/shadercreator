@@ -12,8 +12,7 @@ private slots:
         Shader shader(Shader::VERTEX_SHADER);
 
         QVERIFY(shader.getId() != 0);
-        QVERIFY(shader.isValid());
-        QVERIFY(glIsShader(shader.getId()));
+        QVERIFY(shader.exists());
         QCOMPARE(shader.getType(), Shader::VERTEX_SHADER);
         QCOMPARE(getShaderType(shader), GL_VERTEX_SHADER);
     }
@@ -23,8 +22,7 @@ private slots:
         Shader shader(Shader::FRAGMENT_SHADER);
 
         QVERIFY(shader.getId() != 0);
-        QVERIFY(shader.isValid());
-        QVERIFY(glIsShader(shader.getId()));
+        QVERIFY(shader.exists());
         QCOMPARE(shader.getType(), Shader::FRAGMENT_SHADER);
         QCOMPARE(getShaderType(shader), GL_FRAGMENT_SHADER);
     }
@@ -43,7 +41,7 @@ private slots:
         bool compilationResult = shader.compile("ERRONEOUS CODE");
 
         QVERIFY2(!compilationResult, "shader compilation succeeded");
-        QVERIFY(shader.getLog() != "");
+        QVERIFY(shader.getLastCompilationLog() != "");
     }
 
     void canExtractSource()

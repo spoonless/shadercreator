@@ -11,9 +11,8 @@ private slots:
     {
         ShaderProgram shaderProgram;
 
-        QVERIFY(shaderProgram.isValid());
+        QVERIFY(shaderProgram.exists());
         QVERIFY(shaderProgram.getId() != 0);
-        QVERIFY(glIsProgram(shaderProgram.getId()));
     }
 
     void canAttachDetachShader()
@@ -62,7 +61,7 @@ private slots:
         shaderProgram.attach(shader);
 
         QVERIFY(!shaderProgram.link());
-        QVERIFY(!shaderProgram.getLog().empty());
+        QVERIFY(!shaderProgram.getLastLinkLog().empty());
     }
 
     void canLinkProgramWhenShadersCompiled()
@@ -96,7 +95,7 @@ private slots:
 
         ShaderProgram copy = shaderProgram;
 
-        QVERIFY(copy.isValid());
+        QVERIFY(copy.exists());
         QVERIFY(copy.getId() != 0);
         QVERIFY(glIsProgram(copy.getId()));
         QVERIFY(copy.has(fragmentShader));
@@ -127,6 +126,43 @@ private slots:
         QVERIFY(copy.has(vertexShader));
         QVERIFY(!copy.has(anotherShader));
         QVERIFY(copy.link());
+    }
+
+    void canValidateLinkedProgramWithoutShader()
+    {
+        ShaderProgram shaderProgram;
+        shaderProgram.link();
+
+        QVERIFY(shaderProgram.validate());
+        QVERIFY(!shaderProgram.getLastValidationLog().empty());
+    }
+
+    void cannotValidateUnlinkProgram()
+    {
+        ShaderProgram shaderProgram;
+
+        QVERIFY(!shaderProgram.validate());
+        QVERIFY(!shaderProgram.getLastValidationLog().empty());
+    }
+
+    void canValidateLinkedProgramWhenShadersCompiled()
+    {
+        ShaderProgram shaderProgram;
+
+        Shader fragmentShader(Shader::FRAGMENT_SHADER);
+        shaderProgram.attach(fragmentShader);
+        fragmentShader.compile("void main(){}");
+
+        QVERIFY(shaderProgram.link());
+
+        Shader vertexShader(Shader::VERTEX_SHADER);
+        vertexShader.compile("void main(){}");
+        shaderProgram.attach(vertexShader);
+
+        shaderProgram.link();
+
+        QVERIFY(shaderProgram.validate());
+        QVERIFY(!shaderProgram.getLastValidationLog().empty());
     }
 };
 
