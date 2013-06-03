@@ -14,6 +14,15 @@ public:
     UniformInfo(GLuint index, GLint size, GLenum type, const char* name);
     UniformInfo(const UniformInfo& activeUniformInfo);
 
+    UniformInfo& operator = (const UniformInfo& uniformInfo);
+
+    bool operator == (const UniformInfo& uniformInfo) const;
+
+    inline bool operator != (const UniformInfo& uniformInfo) const
+    {
+        return !(*this == uniformInfo);
+    }
+
     inline const std::string& getName() const
     {
         return _name;

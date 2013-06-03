@@ -13,6 +13,27 @@ UniformInfo::UniformInfo(const UniformInfo& activeUniformInfo)
 {
 }
 
+UniformInfo& UniformInfo::operator = (const UniformInfo& uniformInfo)
+{
+    if (this != &uniformInfo)
+    {
+        _index = uniformInfo._index;
+        _size = uniformInfo._size;
+        _type = uniformInfo._type;
+        _name = uniformInfo._name;
+    }
+    return *this;
+}
+
+bool UniformInfo::operator == (const UniformInfo& uniformInfo) const
+{
+    return this->_index == uniformInfo._index
+            && this->_size == uniformInfo._size
+            && this->_type == uniformInfo._type
+            && this->_name == uniformInfo._name;
+}
+
+
 ShaderProgram::ShaderProgram()
     : _shaderProgramId(glCreateProgram()), _linkageDuration(0)
 {
