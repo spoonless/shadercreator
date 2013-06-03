@@ -1,6 +1,17 @@
+#include <cstring>
 #include "duration.h"
 #include "shaderprogram.h"
 #include "glerror.h"
+
+UniformInfo::UniformInfo(GLuint index, GLint size, GLenum type, const char* name)
+    :_index(index), _size(size), _type(type), _name(name)
+{
+}
+
+UniformInfo::UniformInfo(const UniformInfo& activeUniformInfo)
+    :_index(activeUniformInfo._index), _size(activeUniformInfo._size), _type(activeUniformInfo._type), _name(activeUniformInfo._name)
+{
+}
 
 ShaderProgram::ShaderProgram()
     : _shaderProgramId(glCreateProgram()), _linkageDuration(0)
@@ -150,6 +161,43 @@ bool ShaderProgram::validate()
     extractInfoLog(_lastValidationLog);
 
     return validationStatus == GL_TRUE;
+}
+
+void ShaderProgram::extractActiveUniformInfo(UniformInfoVector& vector)
+{
+    vector.clear();
+    GlError glError;
+    GLint nbUniforms = 0;
+    glGetProgramiv(_shaderProgramId, GL_ACTIVE_UNIFORMS, &nbUniforms);
+    if (glError.hasOccured())
+    {
+        return;
+    }
+    if (nbUniforms > 0)
+    {
+        GLint activeUniformMaxLength = 0;
+        glGetProgramiv(_shaderProgramId, GL_ACTIVE_UNIFORM_MAX_LENGTH, &activeUniformMaxLength);
+        if (glError.hasOccured() || activeUniformMaxLength <= 0)
+        {
+            return;
+        }
+        char* activeUniformName = new char[activeUniformMaxLength];
+        for (int i = 0; i < nbUniforms; ++i)
+        {
+            GLint activeUniformSize = 0;
+            GLenum activeUniformType = 0;
+            glGetActiveUniform(_shaderProgramId, i, activeUniformMaxLength, NULL, &activeUniformSize, &activeUniformType, activeUniformName);
+            if (glError.hasOccured()) {
+                vector.clear();
+                break;
+            }
+            if (strncmp(activeUniformName, "gl_", 3))
+            {
+                vector.push_back(UniformInfo((GLuint) i, activeUniformSize, activeUniformType, activeUniformName));
+            }
+        }
+        delete[]activeUniformName;
+    }
 }
 
 void ShaderProgram::extractInfoLog(std::string& log)

@@ -2,9 +2,45 @@
 #define SHADERPROGRAM_H
 
 #include <string>
+#include <vector>
+#include <memory>
 #include "GL/glew.h"
 
 #include "shader.h"
+
+class UniformInfo
+{
+public:
+    UniformInfo(GLuint index, GLint size, GLenum type, const char* name);
+    UniformInfo(const UniformInfo& activeUniformInfo);
+
+    inline const std::string& getName() const
+    {
+        return _name;
+    }
+
+    inline GLuint getIndex() const
+    {
+        return _index;
+    }
+
+    inline GLint getSize() const
+    {
+        return _size;
+    }
+
+    inline GLenum getType() const
+    {
+        return _type;
+    }
+private:
+    GLuint _index;
+    GLint _size;
+    GLenum _type;
+    std::string _name;
+};
+
+typedef std::vector<UniformInfo> UniformInfoVector;
 
 class ShaderProgram
 {
@@ -26,6 +62,8 @@ public:
     bool link();
 
     bool validate();
+
+    void extractActiveUniformInfo(UniformInfoVector& vector);
 
     inline const std::string& getLastLinkLog() const
     {
