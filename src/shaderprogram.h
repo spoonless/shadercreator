@@ -42,7 +42,13 @@ public:
     {
         return _type;
     }
+
+    inline bool isArray() const
+    {
+        return _size > 1;
+    }
 private:
+    void normalizeArrayName();
     GLuint _index;
     GLint _size;
     GLenum _type;

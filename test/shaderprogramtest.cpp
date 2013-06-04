@@ -204,7 +204,7 @@ private slots:
 
         QCOMPARE(uniformInfoVector.size(), static_cast<size_t>(1));
 
-        QCOMPARE(uniformInfoVector[0], UniformInfo(0, 2, GL_FLOAT_VEC4, "position"));
+        QCOMPARE(uniformInfoVector[0], UniformInfo(0, 2, GL_FLOAT_VEC4, "position[0]"));
     }
 
     void canExtractArrayUniformInfo()
@@ -224,7 +224,7 @@ private slots:
 
         QCOMPARE(uniformInfoVector.size(), static_cast<size_t>(1));
 
-        QCOMPARE(uniformInfoVector[0], UniformInfo(0, 4, GL_FLOAT_VEC4, "position"));
+        QCOMPARE(uniformInfoVector[0], UniformInfo(0, 4, GL_FLOAT_VEC4, "position[0]"));
     }
 
     void canExtractStructUniformInfo()
@@ -262,7 +262,7 @@ private slots:
                 "};"\
                 "uniform MyStruct ms[2];"\
                 "void main() {"\
-                " gl_Position = ms[1].position1[0] + ms[1].position1[1] + vec4(ms[1].position2, 0);"\
+                " gl_Position = ms[1].position1[1] + vec4(ms[1].position2, 0);"\
                 "}";
 
         addShader(shaderProgram, Shader::VERTEX_SHADER, source);
@@ -272,7 +272,7 @@ private slots:
         shaderProgram.extractActiveUniformInfo(uniformInfoVector);
 
         QCOMPARE(uniformInfoVector.size(), static_cast<size_t>(2));
-        QCOMPARE(uniformInfoVector[0], UniformInfo(0, 2, GL_FLOAT_VEC4, "ms[1].position1"));
+        QCOMPARE(uniformInfoVector[0], UniformInfo(0, 2, GL_FLOAT_VEC4, "ms[1].position1[0]"));
         QCOMPARE(uniformInfoVector[1], UniformInfo(1, 1, GL_FLOAT_VEC3, "ms[1].position2"));
     }
 

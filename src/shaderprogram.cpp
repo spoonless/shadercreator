@@ -3,9 +3,13 @@
 #include "shaderprogram.h"
 #include "glerror.h"
 
+#define ARRAY_NORMALIZATION_SUFFIX_LENGTH 3
+#define ARRAY_NORMALIZATION_SUFFIX "[0]"
+
 UniformInfo::UniformInfo(GLuint index, GLint size, GLenum type, const char* name)
     :_index(index), _size(size), _type(type), _name(name)
 {
+    normalizeArrayName();
 }
 
 UniformInfo::UniformInfo(const UniformInfo& activeUniformInfo)
@@ -33,6 +37,23 @@ bool UniformInfo::operator == (const UniformInfo& uniformInfo) const
             && this->_name == uniformInfo._name;
 }
 
+
+void UniformInfo::normalizeArrayName()
+{
+    /*
+     * Uniform array name can be optionally suffixed by [0].
+     * To remove any ambiguity based on OpenGL implementation,
+     * Uniform array name is normalized by appending [0] if necessary.
+     */
+    if (isArray() && _name.length() > ARRAY_NORMALIZATION_SUFFIX_LENGTH)
+    {
+        size_t position = _name.rfind(ARRAY_NORMALIZATION_SUFFIX);
+        if (position != _name.length() - ARRAY_NORMALIZATION_SUFFIX_LENGTH)
+        {
+            _name += ARRAY_NORMALIZATION_SUFFIX;
+        }
+    }
+}
 
 ShaderProgram::ShaderProgram()
     : _shaderProgramId(glCreateProgram()), _linkageDuration(0)
