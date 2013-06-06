@@ -40,14 +40,14 @@ void UniformDeclaration::normalizeArrayName()
     /*
      * Uniform array name can be optionally suffixed by [0].
      * To remove any ambiguity based on OpenGL implementation,
-     * Uniform array name is normalized by appending [0] if necessary.
+     * Uniform array name is normalized by removing [0] if necessary.
      */
-    if (isArray() && _name.length() > ARRAY_NORMALIZATION_SUFFIX_LENGTH)
+    if (_name.length() > ARRAY_NORMALIZATION_SUFFIX_LENGTH)
     {
         size_t position = _name.rfind(ARRAY_NORMALIZATION_SUFFIX);
-        if (position != _name.length() - ARRAY_NORMALIZATION_SUFFIX_LENGTH)
+        if (position == _name.length() - ARRAY_NORMALIZATION_SUFFIX_LENGTH)
         {
-            _name += ARRAY_NORMALIZATION_SUFFIX;
+            _name.erase(position);
         }
     }
 }

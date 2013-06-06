@@ -8,6 +8,7 @@
 TEST_INCLUDE(GlErrorTest)
 TEST_INCLUDE(ShaderTest)
 TEST_INCLUDE(ShaderProgramTest)
+TEST_INCLUDE(UniformDeclarationTest)
 
 int main(int argc, char** argv) {
     QApplication app(argc, argv);
@@ -27,6 +28,7 @@ int main(int argc, char** argv) {
     retval |= TEST_RUN(GlErrorTest);
     retval |= TEST_RUN(ShaderTest);
     retval |= TEST_RUN(ShaderProgramTest);
+    retval |= TEST_RUN(UniformDeclarationTest);
 
     return retval;
 }
