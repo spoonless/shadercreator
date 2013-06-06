@@ -2,60 +2,10 @@
 #define SHADERPROGRAM_H
 
 #include <string>
-#include <vector>
-#include <memory>
 #include "GL/glew.h"
 
 #include "shader.h"
-
-class UniformInfo
-{
-public:
-    UniformInfo(GLuint index, GLint size, GLenum type, const char* name);
-    UniformInfo(const UniformInfo& activeUniformInfo);
-
-    UniformInfo& operator = (const UniformInfo& uniformInfo);
-
-    bool operator == (const UniformInfo& uniformInfo) const;
-
-    inline bool operator != (const UniformInfo& uniformInfo) const
-    {
-        return !(*this == uniformInfo);
-    }
-
-    inline const std::string& getName() const
-    {
-        return _name;
-    }
-
-    inline GLuint getIndex() const
-    {
-        return _index;
-    }
-
-    inline GLint getSize() const
-    {
-        return _size;
-    }
-
-    inline GLenum getType() const
-    {
-        return _type;
-    }
-
-    inline bool isArray() const
-    {
-        return _size > 1;
-    }
-private:
-    void normalizeArrayName();
-    GLuint _index;
-    GLint _size;
-    GLenum _type;
-    std::string _name;
-};
-
-typedef std::vector<UniformInfo> UniformInfoVector;
+#include "uniformdeclaration.h"
 
 class ShaderProgram
 {
@@ -78,7 +28,7 @@ public:
 
     bool validate();
 
-    void extractActiveUniformInfo(UniformInfoVector& vector);
+    void extractActive(UniformDeclarationVector& vector);
 
     inline const std::string& getLastLinkLog() const
     {

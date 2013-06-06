@@ -3,58 +3,6 @@
 #include "shaderprogram.h"
 #include "glerror.h"
 
-#define ARRAY_NORMALIZATION_SUFFIX_LENGTH 3
-#define ARRAY_NORMALIZATION_SUFFIX "[0]"
-
-UniformInfo::UniformInfo(GLuint index, GLint size, GLenum type, const char* name)
-    :_index(index), _size(size), _type(type), _name(name)
-{
-    normalizeArrayName();
-}
-
-UniformInfo::UniformInfo(const UniformInfo& activeUniformInfo)
-    :_index(activeUniformInfo._index), _size(activeUniformInfo._size), _type(activeUniformInfo._type), _name(activeUniformInfo._name)
-{
-}
-
-UniformInfo& UniformInfo::operator = (const UniformInfo& uniformInfo)
-{
-    if (this != &uniformInfo)
-    {
-        _index = uniformInfo._index;
-        _size = uniformInfo._size;
-        _type = uniformInfo._type;
-        _name = uniformInfo._name;
-    }
-    return *this;
-}
-
-bool UniformInfo::operator == (const UniformInfo& uniformInfo) const
-{
-    return this->_index == uniformInfo._index
-            && this->_size == uniformInfo._size
-            && this->_type == uniformInfo._type
-            && this->_name == uniformInfo._name;
-}
-
-
-void UniformInfo::normalizeArrayName()
-{
-    /*
-     * Uniform array name can be optionally suffixed by [0].
-     * To remove any ambiguity based on OpenGL implementation,
-     * Uniform array name is normalized by appending [0] if necessary.
-     */
-    if (isArray() && _name.length() > ARRAY_NORMALIZATION_SUFFIX_LENGTH)
-    {
-        size_t position = _name.rfind(ARRAY_NORMALIZATION_SUFFIX);
-        if (position != _name.length() - ARRAY_NORMALIZATION_SUFFIX_LENGTH)
-        {
-            _name += ARRAY_NORMALIZATION_SUFFIX;
-        }
-    }
-}
-
 ShaderProgram::ShaderProgram()
     : _shaderProgramId(glCreateProgram()), _linkageDuration(0)
 {
@@ -205,7 +153,7 @@ bool ShaderProgram::validate()
     return validationStatus == GL_TRUE;
 }
 
-void ShaderProgram::extractActiveUniformInfo(UniformInfoVector& vector)
+void ShaderProgram::extractActive(UniformDeclarationVector& vector)
 {
     vector.clear();
     GlError glError;
@@ -235,7 +183,7 @@ void ShaderProgram::extractActiveUniformInfo(UniformInfoVector& vector)
             }
             if (strncmp(activeUniformName, "gl_", 3))
             {
-                vector.push_back(UniformInfo((GLuint) i, activeUniformSize, activeUniformType, activeUniformName));
+                vector.push_back(UniformDeclaration((GLuint) i, activeUniformSize, activeUniformType, activeUniformName));
             }
         }
         delete[]activeUniformName;

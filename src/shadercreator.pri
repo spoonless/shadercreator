@@ -2,13 +2,15 @@ SOURCES += mainwindow.cpp \
     shader.cpp \
     glerror.cpp \
     shaderprogram.cpp \
-    duration.cpp
+    duration.cpp \
+    uniformdeclaration.cpp
 
 HEADERS  += mainwindow.h \
     shader.h \
     glerror.h \
     shaderprogram.h \
-    duration.h
+    duration.h \
+    uniformdeclaration.h
 
 FORMS    += mainwindow.ui
 

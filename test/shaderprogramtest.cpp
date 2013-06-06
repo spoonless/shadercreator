@@ -155,19 +155,19 @@ private slots:
         QVERIFY(shaderProgram.validate());
     }
 
-    void canExtractEmptyUniformInfoWhenNoUniform()
+    void canExtractEmptyUniformDeclarationWhenNoUniform()
     {
         ShaderProgram shaderProgram;
         addShader(shaderProgram, Shader::FRAGMENT_SHADER, VALID_FRAGMENT_SHADER_SOURCE);
         QVERIFY(shaderProgram.link());
 
-        UniformInfoVector uniformInfoVector;
-        shaderProgram.extractActiveUniformInfo(uniformInfoVector);
+        UniformDeclarationVector uniformDeclarationVector;
+        shaderProgram.extractActive(uniformDeclarationVector);
 
-        QVERIFY(uniformInfoVector.empty());
+        QVERIFY(uniformDeclarationVector.empty());
     }
 
-    void canExtractUniformInfoWhenOneUniform()
+    void canExtractUniformDeclarationWhenOneUniform()
     {
         ShaderProgram shaderProgram;
         const char* source = \
@@ -179,15 +179,15 @@ private slots:
         addShader(shaderProgram, Shader::VERTEX_SHADER, source);
         QVERIFY(shaderProgram.link());
 
-        UniformInfoVector uniformInfoVector;
-        shaderProgram.extractActiveUniformInfo(uniformInfoVector);
+        UniformDeclarationVector uniformDeclarationVector;
+        shaderProgram.extractActive(uniformDeclarationVector);
 
-        QCOMPARE(uniformInfoVector.size(), static_cast<size_t>(1));
+        QCOMPARE(uniformDeclarationVector.size(), static_cast<size_t>(1));
 
-        QCOMPARE(uniformInfoVector[0], UniformInfo(0, 1, GL_FLOAT_VEC4, "position"));
+        QCOMPARE(uniformDeclarationVector[0], UniformDeclaration(0, 1, GL_FLOAT_VEC4, "position"));
     }
 
-    void canExtractFixedArrayUniformInfo()
+    void canExtractFixedArrayUniformDeclaration()
     {
         ShaderProgram shaderProgram;
         const char* source = \
@@ -199,15 +199,15 @@ private slots:
         addShader(shaderProgram, Shader::VERTEX_SHADER, source);
         QVERIFY(shaderProgram.link());
 
-        UniformInfoVector uniformInfoVector;
-        shaderProgram.extractActiveUniformInfo(uniformInfoVector);
+        UniformDeclarationVector UniformDeclarationVector;
+        shaderProgram.extractActive(UniformDeclarationVector);
 
-        QCOMPARE(uniformInfoVector.size(), static_cast<size_t>(1));
+        QCOMPARE(UniformDeclarationVector.size(), static_cast<size_t>(1));
 
-        QCOMPARE(uniformInfoVector[0], UniformInfo(0, 2, GL_FLOAT_VEC4, "position[0]"));
+        QCOMPARE(UniformDeclarationVector[0], UniformDeclaration(0, 2, GL_FLOAT_VEC4, "position[0]"));
     }
 
-    void canExtractArrayUniformInfo()
+    void canExtractArrayUniformDeclaration()
     {
         ShaderProgram shaderProgram;
         const char* source = \
@@ -219,15 +219,15 @@ private slots:
         addShader(shaderProgram, Shader::VERTEX_SHADER, source);
         QVERIFY(shaderProgram.link());
 
-        UniformInfoVector uniformInfoVector;
-        shaderProgram.extractActiveUniformInfo(uniformInfoVector);
+        UniformDeclarationVector UniformDeclarationVector;
+        shaderProgram.extractActive(UniformDeclarationVector);
 
-        QCOMPARE(uniformInfoVector.size(), static_cast<size_t>(1));
+        QCOMPARE(UniformDeclarationVector.size(), static_cast<size_t>(1));
 
-        QCOMPARE(uniformInfoVector[0], UniformInfo(0, 4, GL_FLOAT_VEC4, "position[0]"));
+        QCOMPARE(UniformDeclarationVector[0], UniformDeclaration(0, 4, GL_FLOAT_VEC4, "position[0]"));
     }
 
-    void canExtractStructUniformInfo()
+    void canExtractStructUniformDeclaration()
     {
         ShaderProgram shaderProgram;
         const char* source = \
@@ -243,16 +243,16 @@ private slots:
         addShader(shaderProgram, Shader::VERTEX_SHADER, source);
         QVERIFY(shaderProgram.link());
 
-        UniformInfoVector uniformInfoVector;
-        shaderProgram.extractActiveUniformInfo(uniformInfoVector);
+        UniformDeclarationVector UniformDeclarationVector;
+        shaderProgram.extractActive(UniformDeclarationVector);
 
-        QCOMPARE(uniformInfoVector.size(), static_cast<size_t>(2));
+        QCOMPARE(UniformDeclarationVector.size(), static_cast<size_t>(2));
 
-        QCOMPARE(uniformInfoVector[0], UniformInfo(0, 1, GL_FLOAT_VEC4, "ms.position1"));
-        QCOMPARE(uniformInfoVector[1], UniformInfo(1, 1, GL_FLOAT_VEC3, "ms.position2"));
+        QCOMPARE(UniformDeclarationVector[0], UniformDeclaration(0, 1, GL_FLOAT_VEC4, "ms.position1"));
+        QCOMPARE(UniformDeclarationVector[1], UniformDeclaration(1, 1, GL_FLOAT_VEC3, "ms.position2"));
     }
 
-    void canExtractStructArrayUniformInfo()
+    void canExtractStructArrayUniformDeclaration()
     {
         ShaderProgram shaderProgram;
         const char* source = \
@@ -268,15 +268,15 @@ private slots:
         addShader(shaderProgram, Shader::VERTEX_SHADER, source);
         QVERIFY(shaderProgram.link());
 
-        UniformInfoVector uniformInfoVector;
-        shaderProgram.extractActiveUniformInfo(uniformInfoVector);
+        UniformDeclarationVector UniformDeclarationVector;
+        shaderProgram.extractActive(UniformDeclarationVector);
 
-        QCOMPARE(uniformInfoVector.size(), static_cast<size_t>(2));
-        QCOMPARE(uniformInfoVector[0], UniformInfo(0, 2, GL_FLOAT_VEC4, "ms[1].position1[0]"));
-        QCOMPARE(uniformInfoVector[1], UniformInfo(1, 1, GL_FLOAT_VEC3, "ms[1].position2"));
+        QCOMPARE(UniformDeclarationVector.size(), static_cast<size_t>(2));
+        QCOMPARE(UniformDeclarationVector[0], UniformDeclaration(0, 2, GL_FLOAT_VEC4, "ms[1].position1[0]"));
+        QCOMPARE(UniformDeclarationVector[1], UniformDeclaration(1, 1, GL_FLOAT_VEC3, "ms[1].position2"));
     }
 
-    void canExtractMultipleUniformInfo()
+    void canExtractMultipleUniformDeclaration()
     {
         ShaderProgram shaderProgram;
         const char* source = \
@@ -289,24 +289,24 @@ private slots:
         addShader(shaderProgram, Shader::VERTEX_SHADER, source);
         QVERIFY(shaderProgram.link());
 
-        UniformInfoVector uniformInfoVector;
-        shaderProgram.extractActiveUniformInfo(uniformInfoVector);
+        UniformDeclarationVector UniformDeclarationVector;
+        shaderProgram.extractActive(UniformDeclarationVector);
 
-        QCOMPARE(uniformInfoVector.size(), static_cast<size_t>(2));
+        QCOMPARE(UniformDeclarationVector.size(), static_cast<size_t>(2));
 
-        for (unsigned int i = 0; i < uniformInfoVector.size(); ++i)
+        for (unsigned int i = 0; i < UniformDeclarationVector.size(); ++i)
         {
-            UniformInfo& uniformInfo = uniformInfoVector[i];
-            QCOMPARE(uniformInfo.getIndex(), static_cast<GLuint>(i));
-            if (uniformInfo.getName() == "position")
+            UniformDeclaration& UniformDeclaration = UniformDeclarationVector[i];
+            QCOMPARE(UniformDeclaration.getIndex(), static_cast<GLuint>(i));
+            if (UniformDeclaration.getName() == "position")
             {
-                QCOMPARE(uniformInfo.getSize(), 1);
-                QCOMPARE(uniformInfo.getType(), static_cast<GLenum>(GL_FLOAT_VEC4));
+                QCOMPARE(UniformDeclaration.getSize(), 1);
+                QCOMPARE(UniformDeclaration.getType(), static_cast<GLenum>(GL_FLOAT_VEC4));
             }
-            else if (uniformInfo.getName() == "mvp")
+            else if (UniformDeclaration.getName() == "mvp")
             {
-                QCOMPARE(uniformInfo.getSize(), 1);
-                QCOMPARE(uniformInfo.getType(), static_cast<GLenum>(GL_FLOAT_MAT4));
+                QCOMPARE(UniformDeclaration.getSize(), 1);
+                QCOMPARE(UniformDeclaration.getType(), static_cast<GLenum>(GL_FLOAT_MAT4));
             }
             else
             {
@@ -315,15 +315,15 @@ private slots:
         }
     }
 
-    void canCopyUniformInfo()
+    void canCopyUniformDeclaration()
     {
-        UniformInfo uniformInfo1(1, 10, GL_FLOAT_MAT2, "uniformInfo1");
-        UniformInfo uniformInfo2(2, 20, GL_FLOAT_MAT3, "uniformInfo2");
+        UniformDeclaration UniformDeclaration1(1, 10, GL_FLOAT_MAT2, "UniformDeclaration1");
+        UniformDeclaration UniformDeclaration2(2, 20, GL_FLOAT_MAT3, "UniformDeclaration2");
 
-        QVERIFY(uniformInfo1 != uniformInfo2);
+        QVERIFY(UniformDeclaration1 != UniformDeclaration2);
 
-        uniformInfo1 = uniformInfo2;
-        QCOMPARE(uniformInfo1, uniformInfo2);
+        UniformDeclaration1 = UniformDeclaration2;
+        QCOMPARE(UniformDeclaration1, UniformDeclaration2);
     }
 
 private:
